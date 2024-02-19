@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Családfa - Reichheldek</title>
+    <link rel="shortcut icon" href="https://i.imgur.com/bMdrjk0.png" type="image/ico" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style> body { margin: 0; } </style>
+  
+    <script src="//unpkg.com/force-graph"></script>
+    <!--<script src="../../dist/force-graph.js"></script>-->
+
+    <script type="text/javascript" th:src="@{/js/stacks.js}"></script>
+    <script type="text/javascript" th:src="@{/js/viewservice.js}"></script>
+    <script type="text/javascript" th:src="@{/js/viewcontrol.js}"></script>
+
+    <script th:inline="javascript">
+      const familydata =  /*[[${familydata}]]*/'';
+      
+      const individualMapById = new Map();
+      const individualMapByName = new Map();
+
+      familydata.nodes.forEach(node => {
+        individualMapById.set(node.id, node);
+        individualMapByName.set(node.name, node)
+      });
+
+      const previousDataSheets = new Stack();
+      const nextDataSheets = new Stack();
+
+      let recentDatasheet = undefined;
+
+    </script>
+  </head>
+  
+  <body>
+    <div id="headerDiv">   
+      <div id="searchContainer">
+        <form id="searchForm" onsubmit="event.preventDefault(); searchIndividual(searchInput.value);" autocomplete="off">
+          <label for="searchInput">Név szerinti keresés:</label>
+          <input id="searchInput" type="text" name="keyword" placeholder="SZEMÉLY NEVE" required/>
+        </form>
+      </div>
+
+      <a href="/">
+        <div id="titleContainer">
+          <h1>Reichheldek</h1>
+          <h2>családfa</h2>
+        </div>
+    </a>
+      <div id="lastUpdateContainer">
+        <p id="lastUpdate"></p>
+      </div>
+    </div>
+
+    <div id="searchResults"></div>    
+
+    <div id="dataSheet"></div>
+
+    <div id="graph"></div>
+
+  
+    <script>
+      // cross-link the nodes 
+      familydata.links.forEach(link => {
+        
+        const a = individualMapById.get(link.source);
+        const b = individualMapById.get(link.target);
+        !a.neighbors && (a.neighbors = []);
+        !b.neighbors && (b.neighbors = []);
+        a.neighbors.push(b);
+        b.neighbors.push(a);
+
+        !a.links && (a.links = []);
+        !b.links && (b.links = []);
+        a.links.push(link);
+        b.links.push(link);
+      });
+
+        // const NODE_R = 8;
+
+        const highlightNodes = new Set();
+        const highlightLinks = new Set();
+        let hoverNode = null;
+  
+      const Graph = ForceGraph()
+        (document.getElementById('graph'))
+          .graphData(familydata)
+          .nodeId('id')
+          .d3AlphaDecay(0.005)
+          .onNodeClick(node => {
+            getIndividualsFullData(node.id)
+            // // Center/zoom on node
+            // Graph.centerAt(node.x, node.y, 1000);
+            // Graph.zoom(2, 2000);
+          })
+          .onNodeHover(node => {
+            highlightNodes.clear();
+            highlightLinks.clear();
+            if (node) {
+              highlightNodes.add(node);
+
+              if(node.neighbors) {
+                node.neighbors.forEach(neighbor => highlightNodes.add(neighbor));
+              }
+              if(node.links) {
+                node.links.forEach(link => highlightLinks.add(link));
+              }
+            }
+
+            hoverNode = node || null;
+            })
+          .onLinkHover(link => {
+            highlightNodes.clear();
+            highlightLinks.clear();
+
+            if (link) {
+            highlightLinks.add(link);
+            highlightNodes.add(link.source);
+            highlightNodes.add(link.target);
+            }
+          })
+          .autoPauseRedraw(true) // keep redrawing after engine has stopped
+          .linkWidth(link => highlightLinks.has(link) ? 5 : 1)
+          .linkColor(link => highlightLinks.has(link) ? 'orange' : 'gray')
+          .linkDirectionalParticles(2)
+          .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 4 : 2)
+          .linkDirectionalParticleColor(link => highlightLinks.has(link) ? 'red' : 'darkgray')
+          .nodeCanvasObject((node, ctx, globalScale) => {
+            const label = node.name;
+            const fontSize = 12/globalScale;
+            ctx.font = `${fontSize}px Sans-Serif`;
+            const textWidth = ctx.measureText(label).width;
+            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = node.color;
+            ctx.fillText(label, node.x, node.y);
+
+            node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+          })
+          .nodePointerAreaPaint((node, color, ctx) => {
+            ctx.fillStyle = color;
+            const bckgDimensions = node.__bckgDimensions;
+            bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+          }); 
+
+      function centerViewAtNode(node) {
+        Graph.centerAt(node.x, node.y, 1000);
+        Graph.zoom(2, 2000);
+      }
+
+      function highlightNode(node) {
+        highlightNodes.clear();
+        highlightLinks.clear();
+        if (node) {
+          highlightNodes.add(node);
+
+          if(node.neighbors) {
+            node.neighbors.forEach(neighbor => highlightNodes.add(neighbor));
+          }
+          if(node.links) {
+            node.links.forEach(link => highlightLinks.add(link));
+          }
+        }
+
+        hoverNode = node || null;
+      }
+    </script>
+
+    <script th:inline="javascript">
+      const lastUpdated = /*[[${updated}]]*/'';
+      let lastUpdatedElement = document.getElementById('lastUpdate');
+      lastUpdatedElement.textContent = 'Frissítve: ' + lastUpdated;
+    </script>
+      
+  </body>
+</html>

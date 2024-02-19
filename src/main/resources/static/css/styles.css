@@ -1,0 +1,287 @@
+:root {
+    font-family: Tahoma, Roboto, sans-serif;
+    overflow-y: hidden;
+}
+
+a {
+    text-decoration: none;
+}
+
+#headerDiv {
+    width: 100%;
+    min-height: 72px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    column-gap: 15%;
+    align-items: center;
+    justify-content: center;
+    background-color: darkslategray;
+    color:aliceblue;
+    margin-bottom: 3px;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+}
+
+#headerDiv h1{font-weight:200;font-size:40px;letter-spacing:6px;padding-left:6px;margin:0;}
+#headerDiv h2{font-size:15px;letter-spacing:4px;padding-left:4px;text-shadow:1.3px 1.3px .5px rgba(0,0,0,0.4);margin:0;}
+
+#searchContainer {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+#titleContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 6px;
+    color:aliceblue;
+}
+
+#lastUpdateContainer {
+    width: 325px;
+    display: flex;
+    justify-content: center;
+}
+
+#lastUpdate {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+#mainContainer {
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.card {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 35px;
+    background-color: powderblue;
+    color: rgb(20, 20, 20);
+    border-radius: 10px;
+}
+
+.card p {
+    margin-top: 0;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
+}
+
+.canOverflow {
+    padding-top: 12px;
+
+    /* scroll bar width, for use in mask calculations */
+    --scrollbar-width: 8px;
+
+    /* mask fade distance, for use in mask calculations */
+    --mask-height: 32px;
+
+    /* If content exceeds height of container, overflow! */
+    overflow-y: auto;
+
+    /* Our height limit */
+    height: 350px;
+
+    /* Need to make sure container has bottom space,
+  otherwise content at the bottom is always faded out */
+    padding-bottom: var(--mask-height);
+
+    /* Keep some space between content and scrollbar */
+    padding-right: 10px;
+
+    /* The CSS mask */
+
+    /* The content mask is a linear gradient from top to bottom */
+    --mask-image-content: linear-gradient(
+        to bottom,
+        transparent,
+        black var(--mask-height),
+        black calc(100% - var(--mask-height)),
+        transparent
+    );
+
+    /* Here we scale the content gradient to the width of the container 
+  minus the scrollbar width. The height is the full container height */
+    --mask-size-content: calc(100% - var(--scrollbar-width)) 100%;
+
+    /* The scrollbar mask is a black pixel */
+    --mask-image-scrollbar: linear-gradient(black, black);
+
+    /* The width of our black pixel is the width of the scrollbar.
+  The height is the full container height */
+    --mask-size-scrollbar: var(--scrollbar-width) 100%;
+
+    /* Apply the mask image and mask size variables */
+    mask-image: var(--mask-image-content), var(--mask-image-scrollbar);
+    mask-size: var(--mask-size-content), var(--mask-size-scrollbar);
+
+    /* Position the content gradient in the top left, and the 
+  scroll gradient in the top right */
+    mask-position: 0 0, 100% 0;
+
+    /* We don't repeat our mask images */
+    mask-repeat: no-repeat, no-repeat;
+}
+
+.dataSheetButtonContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    column-gap: 8px;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+
+.searchResultsButtonContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.button {
+    border-style: solid;
+    border-color: rgb(77, 0, 0);
+    border-width: 1px;
+    border-radius: 100%;
+    font-weight: 800;
+}
+
+.button:hover {
+    color: rgb(78, 78, 78);
+    border-color: #FF3028;
+}
+
+.buttonInactive {
+    border-style: solid;
+    border-color: rgb(77, 0, 0);
+    border-width: 1px;
+    border-radius: 100%;
+    font-weight: 800;
+    opacity: 0.5;
+}
+
+.searchResultsStyles {
+    position: fixed;
+    top: 72px;
+    left: 8%;
+    max-width: 70%;
+    max-height: 50%;
+    background-color: azure;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-color: darkslategray;
+    border-radius: 0 0 20px 20px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+#searchResults ul {
+    list-style-type: none;
+    overflow-y: auto; 
+    padding-right: 40px;  
+}
+
+#searchResults li {
+    padding-left: 5px;
+    margin-bottom: 10px;
+}
+
+.dataSheetStyles {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    width: 500px;
+    max-width: 90%;
+    background-color: azure;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-style: solid;
+    border-left-style: solid;
+    border-color: darkslategray;
+    border-radius: 20px 0 0 0;
+    z-index: 11;
+}
+
+#dataSheet dl {
+    margin-top: 3px;
+}
+
+#dataSheet dt {
+    margin-bottom: 10px;
+}
+
+.dataSheetSubtitle {
+    font-size: smaller;
+    margin-bottom: 0px;
+    padding-left: 6px;
+    text-decoration: underline overline #FF3028;
+}
+
+.familyWrapper {
+    padding: 12px 3px;
+    border-radius: 10px;
+    background-color: powderblue;
+    border-width: 2px;
+    border-color: cadetblue;
+    margin-bottom: 10px;
+}
+
+.parentInFamily {
+    font-weight: 700;
+}
+
+.childInFamily {
+    font-weight: 600;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.clickable:hover {
+    color: rgb(100, 0, 0);
+    text-shadow: 1px 1px #18181820;
+}
+
+@media screen and (max-width: 1360px) {
+    
+    #headerDiv {
+        column-gap: 8%;
+    }
+
+    .canOverflow {
+        height: 280px;
+    }
+}
+
+@media screen and (max-width: 1120px) {
+    /* For mobile phones: */
+    #headerDiv {
+        column-gap: 0;
+        row-gap: 12px;
+        flex-direction: column-reverse;
+    }
+
+    .searchResultsStyles {
+        top: 161px;
+    }
+}
+    
